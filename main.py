@@ -96,7 +96,7 @@ def handle_text(message):
     if not constants.date_of_birth_pattern.match(birthday_date):
         bot.reply_to(message, 'Wrong format. '
                               '\nPlease type "/mybirthday dd.mm.yyyy"'
-                              '\ndd, mm, yyyy - the day, month and year when you were born')
+                              '\ndd, mm, yyyy - der Tag, Monat und das Jahr an dem du geboren bist')
         return
 
     # Check user input for the correct values -----------------------------------------------------------
