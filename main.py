@@ -86,17 +86,17 @@ def handle_text(message):
     words_in_message = message.text.split()
 
     if len(words_in_message) != 2:
-        bot.reply_to(message, 'Wrong format. '
-                              '\nPlease type "/mybirthday dd.mm.yyyy"'
-                              '\n dd, mm, yyyy - the day, month and year when you were born')
+        bot.reply_to(message, 'Du musst dich vertippt haben, '
+                              '\n um es richtig einzugeben tippst du /mybirthday tt.mm.jjjj ein, tt steht für den Tag, mm für den Monat, jjjj für das Jahr. Ein Beispielcommand ist /mybirthday 21.06.2006.'
+                              '\n Du musst aber den command vollständig per Hand eingeben weil wenn du in der Commandliste auf den Command klickst wird automatisch ohne einen Text dahinter abgeschickt.')
         return
 
     birthday_date = words_in_message[1]
 
     if not constants.date_of_birth_pattern.match(birthday_date):
-        bot.reply_to(message, 'Wrong format. '
-                              '\nPlease type "/mybirthday dd.mm.yyyy"'
-                              '\ndd, mm, yyyy - der Tag, Monat und das Jahr an dem du geboren bist')
+        bot.reply_to(message, 'Du musst dich vertippt haben, '
+                              '\n um es richtig einzugeben tippst du /mybirthday tt.mm.jjjj ein, tt steht für den Tag, mm für den Monat, jjjj für das Jahr. Ein Beispielcommand ist /mybirthday 21.06.2006.'
+                              '\n Du musst aber den command vollständig per Hand eingeben weil wenn du in der Commandliste auf den Command klickst wird automatisch ohne einen Text dahinter abgeschickt.')
         return
 
     # Check user input for the correct values -----------------------------------------------------------
@@ -109,22 +109,20 @@ def handle_text(message):
         return
 
     if month in ["04", "06", "09", "11"] and int(day) == 31:
-        bot.reply_to(message, "{} has only 30 days :)".format(constants.months.get(int(month))))
+        bot.reply_to(message, "{} hat nur 30 Tage :)".format(constants.months.get(int(month))))
         return
 
     if month == "02" and int(day) > 29:
-        bot.reply_to(message, "February has only 28 days :)")
+        bot.reply_to(message, "Februar hat nur 28 Tage :)")
         return
 
     if int(month) > 12 or int(month) < 1:
-        bot.reply_to(message, "Looks like something is wrong with the month")
+        bot.reply_to(message, "Etwas scheint mit dem Monat nicht zu stimmen")
         return
 
     if int(year) > 2016 or int(year) < 1900:
         bot.reply_to(message,
-                     "Hey, I don't believe you! You can't be born in {}!"
-                     "\nIf you are woman or (and) you are "
-                     "afraid somebody will find out your age, don't worry, I'll keep it in secret :)"
+                     "Du kannst nicht im Jahr {} gebohren sein!"
                      .format(year))
         bot.send_sticker(message.chat.id, "CAADAgADMgADVSx4C49XV6fn89_VAg")
         return
@@ -154,8 +152,8 @@ def handle_text(message):
             val = (birthday_date, user_id)
             cursor.execute(sql, val)
             db.commit()
-            answer = "Update! \nLooks like {0} went back to past and changed his (her) birth date (somehow)" \
-                     "\nSo {0} was born on {1} {2} now! \nI wonder if his (her) age has changed..." \
+            answer = "Das hat funktioniert, dein Geburtstag ist jetzt richtig eingetragen." \
+                     "Mit /listbirthdays bekommst du eine Liste aller Geburtstage und mit /nextbirthday bekommst du den nächsten, der Geburtstag hat" \
                 .format(name, birthday_date[8:], constants.months.get(int(birthday_date[5:7])))
     else:
         sql = "SELECT DATE_FORMAT(Birthday, '%Y.%m.%d') FROM birthdays WHERE User_Id = %s"
@@ -184,7 +182,8 @@ def handle_text(message):
                 cursor.execute(sql, val)
                 db.commit()
         else:
-            answer = "Hi, {}! \nI'm so glad to meet you! \nI will remember you were born on {} {}" \
+            answer = "Das hat funktioniert, dein Geburtstag ist jetzt richtig eingetragen. " \
+                     "\nMit /listbirthdays bekommst du eine Liste aller Geburtstage und mit /nextbirthday bekommst du den nächsten, der Geburtstag hat." \
                 .format(name, birthday_date[8:], constants.months.get(int(birthday_date[5:7])))
 
         sql = "INSERT INTO birthdays (User_Id, Birthday, Chat_Id) VALUES (%s, %s, %s)"
@@ -199,9 +198,7 @@ def handle_text(message):
 @bot.message_handler(commands=['help'])
 def handle_text(message):
     bot.send_message(message.chat.id,
-                     "mybirthday - /mybirthday [dd.mm.yyyy] The day, month and year when you were born"
-                     "\nnextbirthday - Shows whose birthday is next"
-                     "\naboutme - Shows description")
+                     "mybirthday - /mybirthday [dd.mm.yyyy] Der Tag, der Monat und das Jahr, in dem du geboren wurdest"
 
 
 @bot.message_handler(commands=['aboutme'])
@@ -228,7 +225,7 @@ def handle_text(message):
     Searches whose birthday is next in this chat
     """
     if message.chat.id == message.from_user.id:
-        bot.send_message(message.chat.id, "Well, it's quite obvious whose birthday is next in private chat :D")
+        bot.send_message(message.chat.id, "Dieser Bot funktioniert in privaten Chats nicht!")
         bot.send_sticker(message.chat.id, "CAADAgADMgADVSx4C49XV6fn89_VAg")
         return
 
@@ -242,8 +239,8 @@ def handle_text(message):
         Sends message to the chat telling whose birthday is next
         """
         username_or_first_name = get_username_or_first_name(message.chat.id, query_result[0][0])
-        bot.reply_to(message, "Get ready, {}! You're next! On {} {} we'll tear you apart... "
-                              "With our congratulations! :)"
+        bot.reply_to(message, "{}, du hast als nächstes Geburtstag! "
+                              "Mit unseren Glückwünschen! :)"
                      .format(username_or_first_name, query_result[0][1][3:],
                              constants.months.get(int(query_result[0][1][:2]))))
         bot.send_sticker(message.chat.id, "CAADAgADOgADVSx4C7RBZBTJ4211Ag")
@@ -280,7 +277,7 @@ def handle_text(message):
             answer(result)
             return
 
-    bot.reply_to(message, "Looks like there are no birthdays registered in this chat")
+    bot.reply_to(message, "Es sind in diesem Chat keine Geburtstage gespeichert!")
     bot.send_sticker(message.chat.id, "CAADAgADQAADVSx4CwnTmrLuK3GoAg")
 
 
@@ -296,13 +293,13 @@ def handle_text(message):
     1 - username_or_first_name[, second_person [...]]
     ```
 
-    If no birthdays are found, it says "Looks like there are no birthdays registered in this chat" and sends a sticker
+    If no birthdays are found, it says "Es sind in diesem Chat keine Geburtstage gespeichert!" and sends a sticker
     """
     chat_id = message.chat.id
 
     if chat_id == message.from_user.id:
-        bot.send_message(chat_id, "There's only one birthday coming up here... "
-                                  "And I bet you can guess whose it is XD")
+        bot.send_message(chat_id, "Es ist nur ein Geburtstag gespeichert... "
+                                  "Und ich denke du weißt wessen es ist xD")
         bot.send_sticker(chat_id, "CAADAgADMgADVSx4C49XV6fn89_VAg")
         return
 
@@ -342,7 +339,7 @@ def handle_text(message):
             current_day = day
 
     if not list_of_birthdays:
-        bot.reply_to(message, "Looks like there are no birthdays registered in this chat")
+        bot.reply_to(message, "Es sind in diesem Chat keine Geburtstage gespeichert!")
         bot.send_sticker(chat_id, "CAADAgADQAADVSx4CwnTmrLuK3GoAg")
     else:
         bot.send_message(chat_id, list_of_birthdays)
@@ -352,10 +349,8 @@ def handle_text(message):
 def handle_text(message):
     bot.send_sticker(message.chat.id, "CAADAgADZgADVSx4C4I00LsibnWGAg")
     bot.send_message(message.chat.id,
-                     "Hi! I'm so happy to meet you!!"
-                     "\nNow add me to some chat group and type /mybirthday [your birth date in format dd.mm.yyyy]"
-                     "\nType /aboutme if you want to get more info"
-                     "\nHope you enjoy! :)")
+                     "Das hat funktioniert, dein Geburtstag ist jetzt richtig eingetragen!"
+                     "\nMit /listbirthdays bekommst du eine Liste aller Geburtstage und mit /nextbirthday bekommst du den nächsten, der Geburtstag hat."
 
 
 @bot.callback_query_handler(lambda query: query.data == "pin")
@@ -369,8 +364,8 @@ def pin_message(query):
             bot.edit_message_reply_markup(query_chat_id, query.message.message_id)
             bot.answer_callback_query(query.id)
         except telebot.apihelper.ApiException:
-            bot.send_message(query.message.chat.id, "I can't pin a message(( \nThat's a pity! "
-                                                    "\nLooks like I don't have the appropriate admin rights")
+            bot.send_message(query.message.chat.id, "Ich kann keine Nachrichten anpinnen! "
+                                                    "\nSieht so aus, als hätte ich nicht die entsprechenden Adminrechte.")
     else:
         bot.answer_callback_query(query.id, "You don't have permission to pin messages")
 
